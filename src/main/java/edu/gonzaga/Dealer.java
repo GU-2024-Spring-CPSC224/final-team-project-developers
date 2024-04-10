@@ -34,7 +34,7 @@ public class Dealer {
         return score;
     }
 
-    private int calculateScore() {
+    public int calculateScore() {
         int score = 0;
         int numberOfAces = 0;
 
@@ -56,6 +56,10 @@ public class Dealer {
         }
 
         return score;
+    }
+
+    public void cleanHand(){ 
+        hand.clear();
     }
 
     public String getHandString() {
