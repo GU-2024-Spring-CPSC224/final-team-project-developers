@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Dealer {
-    private final DeckOfCards deck;
     private final List<Card> hand;
 
     public Dealer(DeckOfCards deck) {
-        this.deck = deck;
         this.hand = new ArrayList<>();
     }
 
-    public void initialDeal() {
+    public void initialDeal(DeckOfCards deck) {
         hand.add(deck.dealTopCard()); 
         hand.add(deck.dealTopCard()); 
     }
@@ -24,7 +22,7 @@ public class Dealer {
         return "|XX|";
     }
 
-    public int continuePlay() {
+    public int continuePlay(DeckOfCards deck) {
         int score = calculateScore();
         while (score < 17) {
             hand.add(deck.dealTopCard());
@@ -74,10 +72,10 @@ public class Dealer {
         deck.shuffle();
         Dealer dealer = new Dealer(deck);
 
-        dealer.initialDeal();
+        dealer.initialDeal(deck);
         System.out.println("Dealer's initial hand: \n" + dealer.showInitialHand());
 
-        int finalScore = dealer.continuePlay();
+        int finalScore = dealer.continuePlay(deck);
         System.out.println("Dealer's final hand: \n" + dealer.getHandString());
         if (finalScore > 21) {
             System.out.println("Dealer busted with a score of " + finalScore + ".");
