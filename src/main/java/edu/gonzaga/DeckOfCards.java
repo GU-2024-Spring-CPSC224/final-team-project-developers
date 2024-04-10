@@ -1,4 +1,4 @@
-package src;
+package edu.gonzaga;
 
 import java.util.ArrayList;
 import java.util.Collections;

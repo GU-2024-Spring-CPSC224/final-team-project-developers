@@ -1,4 +1,4 @@
-package src;
+package edu.gonzaga;
 
 import java.util.Objects;
 
@@ -98,6 +98,13 @@ public class Card {
                 return null;
         }
     }
+
+    
+    @Override
+    public String toString() {
+        return rankToString(this.rank) + " of " + suitToString(this.suit);
+    }
+
 
     public static void main(String[] args) {
 
