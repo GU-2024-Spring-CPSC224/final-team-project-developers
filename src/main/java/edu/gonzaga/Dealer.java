@@ -12,7 +12,30 @@ public class Dealer {
         this.hand = new ArrayList<>();
     }
 
-    // Calculates the best score for the hand considering the flexibility of the Ace's value.
+    public void initialDeal() {
+        hand.add(deck.dealTopCard()); 
+        hand.add(deck.dealTopCard()); 
+    }
+
+    public String showInitialHand() {
+        if (hand.size() > 0) {
+            return hand.get(0).toString() + " |XX|"; 
+        }
+        return "|XX|";
+    }
+
+    public int continuePlay() {
+        int score = calculateScore();
+        while (score < 17) {
+            hand.add(deck.dealTopCard());
+            score = calculateScore();
+            if (score > 21) {
+                break; 
+            }
+        }
+        return score;
+    }
+
     private int calculateScore() {
         int score = 0;
         int numberOfAces = 0;
@@ -20,44 +43,46 @@ public class Dealer {
         for (Card card : hand) {
             int rank = card.getRank();
             if (rank == Card.ACE) {
-                numberOfAces += 1;
-                score += 11; // Initially consider Ace as 11
-            } else if (rank >= Card.JACK) { // Jack, Queen, King
+                numberOfAces++;
+                score += 11; 
+            } else if (rank >= Card.JACK) { 
                 score += 10;
             } else {
-                score += rank; // Numeric cards
+                score += rank;
             }
         }
 
-        // Adjust Ace values from 11 to 1 as necessary to avoid busting
         while (score > 21 && numberOfAces > 0) {
-            score -= 10; // Change one Ace from 11 to 1
-            numberOfAces -= 1;
+            score -= 10; 
+            numberOfAces--;
         }
 
         return score;
     }
 
-    public int play() {
-        while (true) {
-            int score = calculateScore();
-            if (score >= 17) {
-                return score > 21 ? 0 : score;
-            }
-            hand.add(deck.dealTopCard()); // Draw a card if score is under 17
+    public String getHandString() {
+        StringBuilder handBuilder = new StringBuilder();
+        for (Card card : hand) {
+            handBuilder.append(card.toString()).append(" "); 
         }
+        return handBuilder.toString().trim(); 
     }
+
 
     public static void main(String[] args) {
         DeckOfCards deck = new DeckOfCards();
         deck.shuffle();
         Dealer dealer = new Dealer(deck);
-        
-        int finalScore = dealer.play();
-        if (finalScore == 0) {
-            System.out.println("Dealer busted.");
+
+        dealer.initialDeal();
+        System.out.println("Dealer's initial hand: \n" + dealer.showInitialHand());
+
+        int finalScore = dealer.continuePlay();
+        System.out.println("Dealer's final hand: \n" + dealer.getHandString());
+        if (finalScore > 21) {
+            System.out.println("Dealer busted with a score of " + finalScore + ".");
         } else {
-            System.out.println("Dealer stands with a score of " + finalScore);
+            System.out.println("Dealer stands with a score of " + finalScore + ".");
         }
     }
 }

@@ -53,36 +53,36 @@ public class Card {
     public static String rankToString(int rank) {
         switch (rank) {
             case ACE:
-                return "Ace";
+                return "A";
             case DEUCE:
-                return "Deuce";
+                return "2";
             case THREE:
-                return "Three";
+                return "3";
             case FOUR:
-                return "Four";
+                return "4";
             case FIVE:
-                return "Five";
+                return "5";
             case SIX:
-                return "Six";
+                return "6";
             case SEVEN:
-                return "Seven";
+                return "7";
             case EIGHT:
-                return "Eight";
+                return "8";
             case NINE:
-                return "Nine";
+                return "9";
             case TEN:
-                return "Ten";
+                return "10";
             case JACK:
-                return "Jack";
+                return "J";
             case QUEEN:
-                return "Queen";
+                return "Q";
             case KING:
-                return "King";
+                return "K";
             default:
-                
-                return null;
+                return "?"; 
         }
     }
+    
 
     public static String suitToString(int suit) {
         switch (suit) {
@@ -99,17 +99,36 @@ public class Card {
         }
     }
 
+
+    private String suitToSymbol(int suit) {
+        switch (suit) {
+            case Card.DIAMONDS: return "♦";
+            case Card.CLUBS:    return "♣";
+            case Card.HEARTS:   return "♥";
+            case Card.SPADES:   return "♠";
+            default:            return "?";
+        }
+    }
     
+
     @Override
     public String toString() {
-        return rankToString(this.rank) + " of " + suitToString(this.suit);
-    }
+    String rank = rankToString(this.rank);
+    String suitSymbol = suitToSymbol(this.suit);
+    
+    // Формируем строку карты вида |K of ♥|
+    return String.format("|%s of %s|", rank, suitSymbol);
+}
+
+
+
+
 
 
     public static void main(String[] args) {
 
-        assert Objects.equals(rankToString(ACE), "Ace");
-        assert Objects.equals(rankToString(DEUCE), "Deuce");
+        assert Objects.equals(rankToString(ACE), "A");
+        assert Objects.equals(rankToString(DEUCE), "2");
         assert Objects.equals(rankToString(THREE), "Three");
         assert Objects.equals(rankToString(FOUR), "Four");
         assert Objects.equals(rankToString(FIVE), "Five");
