@@ -119,7 +119,7 @@ public class Game {
             player.loseBet();
         } else if (dealerScore > 21 || playerScore > dealerScore) {
             System.out.println("Player wins!");
-            player.winBet(1);
+            player.winBet(2);
         } else if (dealerScore == playerScore) {
             System.out.println("It's a tie!");
             player.winBet(1);
