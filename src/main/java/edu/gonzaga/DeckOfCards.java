@@ -7,15 +7,23 @@ import java.util.List;
 
 public class DeckOfCards {
     private final List<Card> deck;
+    private static final int REBUILD_THRESHOLD = 50;
 
     public DeckOfCards() {
         deck = new ArrayList<>();
-        // Create standard deck of 52 cards
-        for (int suit = Card.DIAMONDS; suit <= Card.SPADES; suit++) {
-            for (int rank = Card.ACE; rank <= Card.KING; rank++) {
-                deck.add(new Card(rank, suit));
+        buildDeck();
+    }
+    
+    private void buildDeck() {
+        deck.clear();
+        for (int i = 0; i < 4; i++) { 
+            for (int suit = Card.DIAMONDS; suit <= Card.SPADES; suit++) {
+                for (int rank = Card.ACE; rank <= Card.KING; rank++) {
+                    deck.add(new Card(rank, suit));
+                }
             }
         }
+        shuffle();
     }
 
     public void shuffle() {
@@ -23,9 +31,9 @@ public class DeckOfCards {
     }
 
     public Card dealTopCard() {
-        if (deck.isEmpty()) {
-            System.out.println("No cards left in the deck.");
-            return null;
+        if (deck.isEmpty() || deck.size() < REBUILD_THRESHOLD) {
+            System.out.println("Low on cards. Rebuilding and shuffling the deck.");
+            buildDeck(); 
         }
         return deck.remove(0);
     }

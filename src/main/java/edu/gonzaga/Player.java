@@ -14,8 +14,12 @@ public class Player {
 
     public void initialDeal(DeckOfCards deck) {
         Hand newHand = new Hand();
+        // Card card1 = new Card(10, 1);
+        // Card card2 = new Card(11, 2);
         newHand.addCard(deck.dealTopCard());
         newHand.addCard(deck.dealTopCard());
+        // newHand.addCard(card1);
+        // newHand.addCard(card2);
         hands.add(newHand);
     }
 
@@ -56,43 +60,59 @@ public class Player {
         return "No hand";
     }
 
+    public String showHand(Hand hand) {
+        
+        return hand.showHand();
+
+    }
+
     public boolean canSplit(int handIndex) {
-        if (handIndex < hands.size()) {
+        if (handIndex < hands.size() && this.balance >= hands.get(handIndex).getBet()) {
             Hand hand = hands.get(handIndex);
+            int gameValue1 = getGameValue(hand.getCards().get(0));
+            int gameValue2 = getGameValue(hand.getCards().get(1));
             return hand.getCards().size() == 2 && 
-                   hand.getCards().get(0).getRank() == hand.getCards().get(1).getRank() && 
+                   gameValue1 == gameValue2 && 
                    balance >= hand.getBet();
         }
         return false;
     }
     
-
+    private int getGameValue(Card card) {
+        int rank = card.getRank();
+        if (rank == Card.JACK || rank == Card.QUEEN || rank == Card.KING) {
+            return 10; 
+        }
+        return rank; 
+    }
+    
     public void split(DeckOfCards deck, int handIndex) {
         if (handIndex < hands.size()) {
             Hand originalHand = hands.get(handIndex);
-            if (originalHand.getCards().size() == 2 && originalHand.getCards().get(0).getRank() == originalHand.getCards().get(1).getRank() && balance >= originalHand.getBet()) {
-                balance -= originalHand.getBet();
-                
-                Hand newHand1 = new Hand();
-                newHand1.addCard(originalHand.getCards().remove(0));
-                newHand1.setBet(originalHand.getBet());
+    
+            balance -= originalHand.getBet(); 
+    
+            Hand splitHand1 = new Hand();
+            Hand splitHand2 = new Hand();
+    
+            splitHand1.addCard(originalHand.getCards().remove(0));
+            splitHand1.setBet(originalHand.getBet());
+    
+            splitHand2.addCard(originalHand.getCards().remove(0));
+            splitHand2.setBet(originalHand.getBet());
+    
+            hands.set(handIndex, splitHand1);
+            hands.add(handIndex + 1, splitHand2); 
+    
+            System.out.println("Hands have been split.");
+            
 
-                Hand newHand2 = new Hand();
-                newHand2.addCard(originalHand.getCards().remove(0));
-                newHand2.setBet(originalHand.getBet());
+            System.out.println( getHandDetails(handIndex) + " " + getHandDetails(handIndex + 1));
 
-                newHand1.addCard(deck.dealTopCard());
-                newHand2.addCard(deck.dealTopCard());
-
-                hands.set(handIndex, newHand1);
-                hands.add(newHand2);
-
-                System.out.println("Hands have been split.");
-            } else {
-                System.out.println("Cannot split.");
-            }
         }
     }
+    
+    
 
     public void winBet(int handIndex, double multiplier) {
         if (handIndex < hands.size()) {
@@ -100,9 +120,18 @@ public class Player {
             int winnings = (int) (hand.getBet() * multiplier);
             balance += winnings;
             hand.setBet(0);
-            System.out.println("Won " + winnings + " with hand " + (handIndex + 1));
+            System.out.println("Won " + winnings/2 + " with hand " + (handIndex + 1));
         }
     }
+
+    public void loseBet(int handIndex) {
+        if (handIndex < hands.size()) {
+            Hand hand = hands.get(handIndex);
+            hand.setBet(0);
+            System.out.println("Lost bet for hand " + (handIndex + 1));
+        }
+    }
+    
 
     public void pushBet(int handIndex) {
         if (handIndex < hands.size()) {
@@ -126,4 +155,14 @@ public class Player {
     public void cleanHands() {
         hands.clear();
     }
+
+
+    public String getHandDetails(int handIndex) {
+        if (handIndex >= 0 && handIndex < hands.size()) {
+            Hand hand = hands.get(handIndex);
+            return "Hand " + (handIndex + 1) + ": " + hand.showHand();
+        }
+        return "Invalid hand index";
+    }
+    
 }
