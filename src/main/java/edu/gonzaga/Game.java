@@ -12,118 +12,125 @@ public class Game {
         scanner = new Scanner(System.in);
         System.out.print("Enter your balance: ");
         int balance = scanner.nextInt();
-        scanner.nextLine();
-        dealer = new Dealer(deck);
-        player = new Player(deck, balance);
-        scanner = new Scanner(System.in);
-        deck = new DeckOfCards(); 
+        scanner.nextLine(); // Очищаем буфер после ввода числа
+        deck = new DeckOfCards(); // Инициализация колоды
+        dealer = new Dealer(deck); // Создание дилера с доступом к колоде
+        player = new Player(balance); // Создание игрока с начальным балансом
     }
 
     public void start() {
         while(true) {
             deck.shuffle();
+            dealer.cleanHand();
+            player.cleanHands();
+            initialDeal();
             System.out.print("Place your bet: ");
             int bet = scanner.nextInt();
             scanner.nextLine();
             player.placeBet(bet);
-            dealer.cleanHand();
-            player.cleanHand();
-            initialDeal();
+            
+           
+
             showInitialHands();
-            playerTurn();
+            for (int i = 0; i < player.getHands().size(); i++) {
+                playerTurn(i);
+            }
             dealerTurn();
             determineWinner();
             
             System.out.println("Your balance is now: " + player.getBalance());
 
             if (!askToContinue()) {
+                System.out.println("Game over. Your final balance is: " + player.getBalance());
                 break;
             }
-
         }
 
-        scanner.close(); 
-    }
-    private boolean askToContinue() {
-        System.out.print("Would you like to play another round? (y/n): ");
-        String input = scanner.nextLine().trim().toLowerCase();
-        return input.equals("y");
+        scanner.close();
     }
 
     private void initialDeal() {
-        // Initial deal for dealer and player
-        dealer.initialDeal(deck);
-        player.takeCard(deck);
-        player.takeCard(deck);
+        dealer.initialDeal(deck); // Дилер получает две карты
+        player.initialDeal(deck); // Игрок получает две карты
     }
 
     private void showInitialHands() {
-        // Show initial hands
         System.out.println("Dealer's initial hand: " + dealer.showInitialHand());
-        System.out.println("Player's initial hand: " + player.showHand());
+        System.out.println("Player's initial hand: " + player.showHand(0));
     }
 
-    public void hit() {
-        // Player takes a card
-        player.takeCard(deck);
-        System.out.println("Player's hand: " + player.showHand());
-        if (player.calculateScore() > 21) {
-            System.out.println("Player busted.");
-            player.stand();
-        }
-    }
-
-    public void stand() {
-        // Player stands
-        player.stand();
-        System.out.println("Player stands.");
-    }
-
-    private void playerTurn() {
-        while (!player.isStanding()) {
-            System.out.print("Do you want to take another card? (y/n): ");
-            String input = scanner.nextLine().trim().toLowerCase();
-            if ("y".equals(input)) {
-                hit();
-            } else if ("n".equals(input)) {
-                stand();
-                break;
-            } else {
-                System.out.println("Invalid input. Please type 'hit' or 'stand'.");
+    private void playerTurn(int handIndex) {
+        while (!player.getHands().get(handIndex).isStanding()) {
+            System.out.print("Choose an action for hand " + (handIndex + 1) + ": Hit (h), Stand (s), Double Down (d)" + (player.canSplit(handIndex) ? ", Split (p)" : "") + ": ");
+            String action = scanner.nextLine().trim().toLowerCase();
+            switch (action) {
+                case "h":
+                    player.takeCard(deck, handIndex);
+                    System.out.println("Player's hand " + (handIndex + 1) + ": " + player.showHand(handIndex));
+                    break;
+                case "s":
+                    player.stand(handIndex);
+                    break;
+                // case "d":
+                //     if (player.canDoubleDown(handIndex)) {
+                //         player.doubleDown(deck, handIndex);
+                //    }
+                //     break;
+                case "p":
+                    if (player.canSplit(handIndex)) {
+                        player.split(deck, handIndex);
+                        playerTurn(player.getHands().size() - 1); // Recursively handle the new hand
+                    }
+                    break;
+                default:
+                    System.out.println("Invalid input.");
+                    break;
             }
+            if (player.getHands().get(handIndex).calculateScore() > 21) {
+                System.out.println("Player busted on hand " + (handIndex + 1));
+                player.getHands().get(handIndex).stand();
+            }
+            if (player.getHands().get(handIndex).isStanding()) break;
         }
     }
 
     private void dealerTurn() {
-        // Dealer's turn
-        if (!player.isStanding() || player.calculateScore() <= 21) {
-            dealer.continuePlay(deck);
-            System.out.println("Dealer's final hand: " + dealer.getHandString());
-            if (dealer.calculateScore() > 21) {
-                System.out.println("Dealer busted.");
-            }
-        }
+        dealer.continuePlay(deck);
+        System.out.println("Dealer's final hand: " + dealer.getHandString());
     }
 
     private void determineWinner() {
-        // Determine the winner and print the result
         int dealerScore = dealer.calculateScore();
-        int playerScore = player.calculateScore();
-
-        System.out.println("\nFinal scores:");
-        System.out.println("Dealer: " + dealerScore);
-        System.out.println("Player: " + playerScore);
-
-        if (playerScore > 21 || (dealerScore <= 21 && dealerScore > playerScore)) {
-            System.out.println("Dealer wins!");
-            player.loseBet();
-        } else if (dealerScore > 21 || playerScore > dealerScore) {
-            System.out.println("Player wins!");
-            player.winBet(2);
-        } else if (dealerScore == playerScore) {
-            System.out.println("It's a tie!");
-            player.winBet(1);
+        for (int i = 0; i < player.getHands().size(); i++) {
+            int playerScore = player.calculateScore(i);
+            System.out.println("\nFinal scores for hand " + (i + 1) + ":");
+            System.out.println("Dealer: " + dealerScore);
+            System.out.println("Player: " + playerScore);
+    
+            double multiplier = 2; // Обычный выигрыш
+            if (playerScore == 21 && player.getHands().get(i).getCards().size() == 2) {
+                multiplier = 1.5; // Выигрыш блэкджека
+            }
+    
+            if (playerScore > 21) {
+                System.out.println("Player busts with hand " + (i + 1));
+            } else if (dealerScore > 21 || playerScore > dealerScore) {
+                System.out.println("Player wins with hand " + (i + 1));
+                player.winBet(i, multiplier);
+            } else if (dealerScore > playerScore) {
+                System.out.println("Dealer wins against hand " + (i + 1));
+            } else {
+                System.out.println("It's a tie with hand " + (i + 1));
+                player.pushBet(i);
+            }
         }
+    }
+    
+
+    private boolean askToContinue() {
+        System.out.print("Would you like to play another round? (y/n): ");
+        String input = scanner.nextLine().trim().toLowerCase();
+        return input.equals("y");
     }
 
     public static void main(String[] args) {
