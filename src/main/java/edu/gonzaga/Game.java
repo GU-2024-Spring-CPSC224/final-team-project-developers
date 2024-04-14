@@ -10,12 +10,19 @@ public class Game {
 
     public Game() {
         scanner = new Scanner(System.in);
-        System.out.print("Enter your balance: ");
-        int balance = scanner.nextInt();
-        scanner.nextLine(); 
         deck = new DeckOfCards();
         dealer = new Dealer(deck);
-        player = new Player(balance);
+        setInitialBalance();
+    }
+
+    private void setInitialBalance(){ 
+        System.out.print("Enter your balance: ");
+        int balance = scanner.nextInt();
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine(); 
+        scanner.nextLine();
+        player = new Player(balance, name );
+        //shpuld take it from the file in future 
     }
 
     public void start() {
@@ -29,8 +36,6 @@ public class Game {
             scanner.nextLine();
             player.placeBet(bet);
             
-           
-
             showInitialHands();
             for (int i = 0; i < player.getHands().size(); i++) {
                 playerTurn(i);
@@ -61,53 +66,95 @@ public class Game {
 
     private void playerTurn(int handIndex) {
         Hand hand = player.getHands().get(handIndex);
+        checkIfBlackJack(hand, handIndex); 
         while (!hand.isStanding() && hand.calculateScore() <= 21) {
             String helperString = "";
-            if (hand.getCards().size() > 1) {
-                if (player.canSplit(handIndex)) {
-                    helperString += ", Split (p)";
-                }
-            }
+            helperString += createOutput(hand, handIndex, helperString); 
             System.out.print("Choose an action for hand " + (handIndex + 1) + ": Hit (h), Stand (s)" + helperString + ": ");
             String action = scanner.nextLine().trim().toLowerCase();
     
             switch (action) {
                 case "h":
-                    player.takeCard(deck, handIndex);
-                    System.out.println("Player's hand " + (handIndex + 1) + ": " + player.showHand(handIndex));
+                    hit(hand, handIndex); 
                     break;
                 case "s":
                     hand.stand();
                     break;
+                case "d":
+                    doubleBet(hand, handIndex);
+                    break; 
                 case "p":
-                    if (player.canSplit(handIndex)) {
-                        player.split(deck, handIndex);
-                        handlePostSplit(handIndex); 
-                        return; 
-                    }
+                    split(handIndex, hand);
                     break;
                 default:
                     System.out.println("Invalid input. Please choose a valid action.");
                     continue;
             }
-    
-            if (hand.calculateScore() > 21) {
-                System.out.println("Player busted on hand " + (handIndex + 1));
-                hand.stand(); 
+
+            checkIfBusted(hand, handIndex);
+        }
+    }
+
+    private String createOutput(Hand hand, int handIndex, String helperString){
+        if (player.canDouble(handIndex)){
+            helperString += ", Double (d)" ; 
+        }
+        if (hand.getCards().size() > 1) {
+            if (player.canSplit(handIndex)) {
+                helperString += ", Split (p)";
             }
         }
+        return helperString;
     }
 
+    private void hit(Hand hand, int handIndex ){
+        player.takeCard(deck, handIndex);
+        System.out.println("--------------------------------");
+        System.out.println("Dealer's hand:   " + dealer.showInitialHand());
+        System.out.println("Player's hand " + (handIndex + 1) + ": " + player.showHand(handIndex));
+        System.out.println("Score of your hand is: " + hand.calculateScore());
+        System.out.println("--------------------------------");
+        hand.madeMove(); 
+    }
 
-    private void handlePostSplit(int splitIndex) {
-        // Начинаем обработку с текущего индекса руки, который был разделен
-        for (int newIndex = splitIndex; newIndex < player.getHands().size(); newIndex++) {
-            playerTurn(newIndex);
+    private void doubleBet(Hand hand, int handIndex){
+        player.takeCard(deck, handIndex);
+        player.placeBet(hand.getBet(), hand);
+        System.out.println("--------------------------------");
+        System.out.println("Dealer's hand: " + dealer.showInitialHand());
+        System.out.println("Player's hand " + (handIndex + 1) + ": " + player.showHand(handIndex)); 
+        System.out.println("Score of your hand is: " + hand.calculateScore());
+        System.out.println("--------------------------------");
+        hand.madeMove(); 
+    }
+
+    private void split(int handIndex, Hand hand){
+        if (player.canSplit(handIndex)) {
+            player.split(deck, handIndex);
+            // for (int newIndex = handIndex; newIndex < player.getHands().size(); newIndex++) {
+            //     if (!hand.isStanding()){
+            //     playerTurn(newIndex);
+            //     }
+            // }
+            return; 
         }
     }
-    
-    
-    
+
+    private boolean checkIfBlackJack(Hand hand, int handIndex){ 
+        if (hand.calculateScore() == 21 && hand.getCards().size() == 2) {
+            System.out.println("Player got BlackJack hand:" + (handIndex + 1));
+            hand.stand(); 
+            return true; 
+        }
+        return false; 
+    }
+
+    private void checkIfBusted(Hand hand, int handIndex){
+        if (hand.calculateScore() > 21) {
+            System.out.println("Player busted on hand " + (handIndex + 1));
+            hand.stand(); 
+        }
+    }
     
 
     private void dealerTurn() {

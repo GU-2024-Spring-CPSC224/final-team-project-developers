@@ -4,22 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
+    public String name; 
     private List<Hand> hands;
     private int balance;
 
-    public Player(int initialBalance) {
+    public Player(int initialBalance, String name) {
         this.hands = new ArrayList<>();
         this.balance = initialBalance;
     }
 
     public void initialDeal(DeckOfCards deck) {
         Hand newHand = new Hand();
-        // Card card1 = new Card(10, 1);
-        // Card card2 = new Card(11, 2);
+
         newHand.addCard(deck.dealTopCard());
         newHand.addCard(deck.dealTopCard());
-        // newHand.addCard(card1);
-        // newHand.addCard(card2);
+
+        //for testing purposes
+        /****************************
+         
+        Card card1 = new Card(10, 1);
+        Card card2 = new Card(11, 2);
+        newHand.addCard(card1);
+        newHand.addCard(card2);
+
+        ****************************/ 
         hands.add(newHand);
     }
 
@@ -32,6 +40,11 @@ public class Player {
         } else {
             System.out.println("Not enough balance to place the bet or no hand available.");
         }
+    }
+
+    public void placeBet(int amount, Hand hand){ 
+        hand.setBet(amount + hand.getBet());
+        balance -= amount;
     }
 
     public void takeCard(DeckOfCards deck, int handIndex) {
@@ -66,8 +79,17 @@ public class Player {
 
     }
 
+    public boolean canDouble(int handIndex) {
+        if (handIndex < hands.size()&& !hands.get(handIndex).getMoveMade() && this.balance >= hands.get(handIndex).getBet() && this.balance >= hands.get(handIndex).getBet()) {
+            return true;
+        }
+        else{ 
+            return false; 
+        }
+    }
+
     public boolean canSplit(int handIndex) {
-        if (handIndex < hands.size() && this.balance >= hands.get(handIndex).getBet()) {
+        if (handIndex < hands.size() && this.balance >= hands.get(handIndex).getBet() && hands.size() <= 5) {
             Hand hand = hands.get(handIndex);
             int gameValue1 = getGameValue(hand.getCards().get(0));
             int gameValue2 = getGameValue(hand.getCards().get(1));

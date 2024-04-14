@@ -7,17 +7,27 @@ public class Hand {
     private List<Card> cards;
     private int bet;
     private boolean isStanding;
+    private boolean madeMove; 
 
     public Hand() {
         this.cards = new ArrayList<>();
         this.bet = 0;
         this.isStanding = false;
+        this.madeMove = false;
     }
 
     public void addCard(Card card) {
         if (!isStanding) {
             cards.add(card);
         }
+    }
+
+    public void madeMove(){
+        madeMove = true;
+    }
+
+    public boolean getMoveMade(){
+        return madeMove;
     }
 
     public int getBet() {
