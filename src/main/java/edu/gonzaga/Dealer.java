@@ -15,6 +15,11 @@ public class Dealer {
         hand.add(deck.dealTopCard()); 
     }
 
+    public List<Card> getHand(){
+        return hand;
+    }
+
+    
     public String showInitialHand() {
         if (hand.size() > 0) {
             return hand.get(0).toString() + " |XX|"; 

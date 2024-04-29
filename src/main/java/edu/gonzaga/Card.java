@@ -2,6 +2,8 @@ package edu.gonzaga;
 
 import java.util.Objects;
 
+import javax.swing.ImageIcon;
+
 public class Card {
     private final int rank;
     private final int suit;
@@ -36,6 +38,25 @@ public class Card {
 
     public int getSuit() {
         return suit;
+    }
+    private String getSuitString() {
+        switch (suit) {
+            case DIAMONDS: return "d";
+            case CLUBS:    return "c";
+            case HEARTS:   return "h";
+            case SPADES:   return "s";
+            default:       return "unknown";
+        }
+    }
+
+    private String getRankString() {
+        return rank < 10 ? "0" + rank : String.valueOf(rank);
+    }
+
+     public String getCardImage() {
+        String imageName = getSuitString() + getRankString() + ".png";
+        String imagePath = "Classic/" + imageName;
+        return (imagePath);
     }
 
     public int getRank() {

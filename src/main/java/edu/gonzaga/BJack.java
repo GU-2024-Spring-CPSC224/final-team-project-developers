@@ -5,23 +5,53 @@ import java.awt.*;
 
 public class BJack {
 
-    private static JPanel[] dealerCardSlots = new JPanel[1];
-    private static JPanel[] playerCardSlots = new JPanel[4];
+    private CardSlot[] dealerCardSlots = new CardSlot[1];
+    private CardSlot[] playerCardSlots = new CardSlot[4];
+    
     private String basicCard ; 
+
+    private PlayerInfo playerInfo;
+    private JLabel balanceLabel;
+
+    private DeckOfCards deck;
+    private Player player ;
+    private Dealer dealer;
 
 
     public BJack(){
         basicCard = "Classic/basic.png"; 
+        playerInfo = new PlayerInfo();
+        deck = new DeckOfCards();
+        dealer = new Dealer(deck);
     }
+
+    // In the BJack class
+    private void promptForPlayerNameAndStart() {
+        String name = JOptionPane.showInputDialog(null, "Enter your name:", "Player Name", JOptionPane.PLAIN_MESSAGE);
+        
+        if (name != null && !name.trim().isEmpty() && name.matches("^[a-zA-Z0-9]*$")) {
+            if (playerInfo.playerExists(name)) {
+                int balance = playerInfo.getBalance(name);
+                balanceLabel = new JLabel("Balance: $" + balance);
+                player = new Player(balance, name);
+                createAndShowGUI();
+            } else {
+                JOptionPane.showMessageDialog(null, "Wrong user name", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Illegal name entered. Please use only letters and numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+
 
     private void createAndShowGUI() {
         JFrame frame = new JFrame("Blackjack Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 600); // Landscape orientation
+        frame.setSize(900, 600); 
 
         Color tableColor = new Color(135, 152, 122);
 
-        // Panel for buttons
         JPanel buttonPanel = new JPanel(new GridLayout(1, 5, 10, 10));
         buttonPanel.setBackground(tableColor); 
 
@@ -34,7 +64,7 @@ public class BJack {
         customizeButton(doubleButton);
         customizeButton(splitButton);
 
-        JLabel balanceLabel = new JLabel("Balance: $10,000", JLabel.CENTER);
+        JLabel balanceLabel = this.balanceLabel;
         customizeLabel(balanceLabel);
 
         buttonPanel.add(hitButton);
@@ -49,9 +79,23 @@ public class BJack {
         gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.PAGE_AXIS));
 
   
+        ImageIcon cardIcon = new ImageIcon(basicCard);
+        Image image = cardIcon.getImage().getScaledInstance(80, 120, Image.SCALE_SMOOTH);
+        cardIcon = new ImageIcon(image);
+    
+        JPanel dealerCardArea = new JPanel();
+        dealerCardArea.setBackground(tableColor);
+        dealerCardSlots[0] = new CardSlot(tableColor, cardIcon);
+        dealerCardArea.add(dealerCardSlots[0].getCardSlotPanel());
+    
+        JPanel playerCardArea = new JPanel();
+        playerCardArea.setBackground(tableColor);
+        playerCardArea.setLayout(new GridLayout(1, 4, 10, 0));
+        for (int i = 0; i < playerCardSlots.length; i++) {
+            playerCardSlots[i] = new CardSlot(tableColor, cardIcon);
+            playerCardArea.add(playerCardSlots[i].getCardSlotPanel());
+        }
 
-        JPanel dealerCardArea = createCardArea(tableColor, 1, dealerCardSlots, this.basicCard);
-        JPanel playerCardArea = createCardArea(tableColor, 4, playerCardSlots, this.basicCard);
         gamePanel.add(dealerCardArea, BorderLayout.NORTH);
         gamePanel.add(Box.createVerticalStrut(20), BorderLayout.CENTER); 
         gamePanel.add(playerCardArea, BorderLayout.SOUTH);
@@ -65,8 +109,6 @@ public class BJack {
     private static void customizeButton(JButton button) {
         button.setPreferredSize(new Dimension(150, 100));
         button.setFont(new Font("Serif", Font.BOLD, 20));
-        // Optionally set the background color of the button
-        // button.setBackground(Color.WHITE);
     }
 
     private static void customizeLabel(JLabel label) {
@@ -75,46 +117,47 @@ public class BJack {
         label.setOpaque(true);
     }
 
-    private static JPanel createCardArea(Color backgroundColor, int numSlots, JPanel[] cardSlots, String cardImagePath) {
-        JPanel cardArea = new JPanel();
-        cardArea.setBackground(backgroundColor);
-        cardArea.setLayout(new GridLayout(1, numSlots, 10, 0)); 
-    
-        ImageIcon cardIcon = new ImageIcon(cardImagePath);
-        Image image = cardIcon.getImage().getScaledInstance(80, 120, Image.SCALE_SMOOTH);
-        cardIcon = new ImageIcon(image);
-    
-        for (int i = 0; i < numSlots; i++) {
-            JPanel cardSlot = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
-            cardSlot.setBackground(backgroundColor);
-            cardSlot.setPreferredSize(new Dimension(180, 120));
-            
-            JLabel card1 = new JLabel(cardIcon);
-            JLabel card2 = new JLabel(cardIcon);
-            cardSlot.add(card1);
-            cardSlot.add(card2);
-    
-            cardArea.add(cardSlot);
-            cardSlots[i] = cardSlot;
-        }
-    
-        return cardArea;
-    }
-    
 
-    private static void updateCardImage(JLabel cardLabel, String imagePath) {
+    private void updateCardImage(JLabel cardLabel, String imagePath) {
         ImageIcon newIcon = new ImageIcon(imagePath);
         Image newImg = newIcon.getImage().getScaledInstance(cardLabel.getWidth(), cardLabel.getHeight(), Image.SCALE_SMOOTH);
         newIcon = new ImageIcon(newImg);
         cardLabel.setIcon(newIcon);
-    
+
         cardLabel.revalidate();
         cardLabel.repaint();
     }
 
+    private String getImagePathForCard(Card card) {
+        return card.getCardImage();
+    }
+
+    private void startGame() {
+        deck.shuffle(); 
+    
+        player.initialDeal(deck);
+        dealer.initialDeal(deck);
+
+        Hand hand = player.getHands().get(0); 
+        for (int cardIndex = 0; cardIndex < hand.getCards().size(); cardIndex++) {
+            Card card = hand.getCards().get(cardIndex); 
+            String cardImagePath = getImagePathForCard(card); 
+            updateCardImage(playerCardSlots[0].getCardLabel(cardIndex), cardImagePath); 
+        }
+        
+        Card deCard1 = dealer.getHand().get(0);
+
+        String cardImagePath = getImagePathForCard(deCard1); 
+        updateCardImage(dealerCardSlots[0].getCardLabel(0), cardImagePath); 
+        updateCardImage(dealerCardSlots[0].getCardLabel(1), "Classic/Card-Back-05.png"); 
+    }
+    
+
 
     public static void main(String[] args) {
         BJack bJack = new BJack();
-        bJack.createAndShowGUI();
+        bJack.promptForPlayerNameAndStart();
+        // bJack.createAndShowGUI();
+        bJack.startGame();
     }
 }
