@@ -8,6 +8,7 @@ import java.util.Map;
 public class PlayerInfo {
     private static final String FILENAME = "players.txt";
     private Map<String, Integer> playerBalances;
+    public Integer balance = 0; 
 
     public PlayerInfo() {
         playerBalances = new HashMap<>();
@@ -15,13 +16,22 @@ public class PlayerInfo {
     }
 
     public boolean playerExists(String name) {
-        return playerBalances.containsKey(name);
+        if (playerBalances.containsKey(name)){
+            this.balance = playerBalances.get(name);
+            return true;
+        }
+        else return false;
     }
 
 
+    public void printPlayerBalances() {
+        for (Map.Entry<String, Integer> entry : playerBalances.entrySet()) {
+            System.out.println("Player: " + entry.getKey() + ", Balance: " + entry.getValue());
+        }
+    }
+
     private void loadPlayerBalances() {
         try {
-            // Read all lines from the file
             Path path = Paths.get(FILENAME);
             if (Files.exists(path)) {
                 Files.readAllLines(path).forEach(line -> {
@@ -34,13 +44,6 @@ public class PlayerInfo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public int getBalance(String name) {
-        return playerBalances.computeIfAbsent(name, k -> {
-            savePlayerBalances(); // Save when a new player is added
-            return 1000;
-        });
     }
 
     public void updateBalance(String name, int balance) {

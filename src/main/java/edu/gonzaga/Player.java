@@ -13,21 +13,20 @@ public class Player {
         this.balance = initialBalance;
     }
 
+
     public void initialDeal(DeckOfCards deck) {
         Hand newHand = new Hand();
 
-        newHand.addCard(deck.dealTopCard());
-        newHand.addCard(deck.dealTopCard());
+        // newHand.addCard(deck.dealTopCard());
+        // newHand.addCard(deck.dealTopCard());
 
         //for testing purposes
-        /****************************
-         
+
         Card card1 = new Card(10, 1);
         Card card2 = new Card(11, 2);
         newHand.addCard(card1);
         newHand.addCard(card2);
 
-        ****************************/ 
         hands.add(newHand);
     }
 
@@ -100,6 +99,10 @@ public class Player {
         return false;
     }
     
+
+    public String getName(){
+        return this.name;
+    }
     private int getGameValue(Card card) {
         int rank = card.getRank();
         if (rank == Card.JACK || rank == Card.QUEEN || rank == Card.KING) {
@@ -164,8 +167,6 @@ public class Player {
         }
     }
     
-    
-
     public int getBalance() {
         return balance;
     }
@@ -178,6 +179,9 @@ public class Player {
         hands.clear();
     }
 
+    public void setBalance(Integer balance){
+        this.balance = balance;
+    }
 
     public String getHandDetails(int handIndex) {
         if (handIndex >= 0 && handIndex < hands.size()) {

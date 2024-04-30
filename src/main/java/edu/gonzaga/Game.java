@@ -11,7 +11,7 @@ public class Game {
     public Game() {
         scanner = new Scanner(System.in);
         deck = new DeckOfCards();
-        dealer = new Dealer(deck);
+        dealer = new Dealer();
         setInitialBalance();
     }
 
@@ -163,7 +163,7 @@ public class Game {
     }
 
     private void determineWinner() {
-        int dealerScore = dealer.calculateScore();
+        int dealerScore = dealer.getHand().calculateScore();
         for (int i = 0; i < player.getHands().size(); i++) {
             int playerScore = player.calculateScore(i);
             System.out.println("\nFinal scores for hand " + (i + 1) + ":");
