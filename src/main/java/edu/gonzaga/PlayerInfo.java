@@ -12,7 +12,8 @@ public class PlayerInfo {
 
     public PlayerInfo() {
         playerBalances = new HashMap<>();
-        loadPlayerBalances();
+        playerBalances.put("Gavin", 2000);
+        // loadPlayerBalances();
     }
 
     public boolean playerExists(String name) {

@@ -1,4 +1,2 @@
-null,2100
-null,2000
 Murat,2000
 Kaka,22222
