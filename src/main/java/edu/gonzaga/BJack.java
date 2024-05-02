@@ -57,9 +57,11 @@ public class BJack {
                 createAndShowGUI();
             } else {
                 JOptionPane.showMessageDialog(null, "Wrong user name", "Error", JOptionPane.ERROR_MESSAGE);
+                promptForPlayerNameAndStart();
             }
         } else {
             JOptionPane.showMessageDialog(null, "Illegal name entered. Please use only letters and numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+            promptForPlayerNameAndStart();
         }
     }
 
