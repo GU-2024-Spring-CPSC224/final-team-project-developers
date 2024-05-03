@@ -1,20 +1,25 @@
 package edu.gonzaga;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TitleGUI extends JFrame {
+
+public class TitleGUI extends JDialog {
     private JButton singleplayerButton;
     private JButton multiplayerButton;
-    String answer ="";
+    private boolean clicked = false;
+    private String answer = "";
+    public PlayerBalanceInfo playerBalanceInfo;
+    private BJack game = new BJack();
 
-    public String TitleGUI() {
+    PlayerInfo playerInfo = new PlayerInfo();
 
+    public TitleGUI() {
         setTitle("Blackjack");
         setSize(600, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -29,8 +34,15 @@ public class TitleGUI extends JFrame {
         singleplayerButton = new JButton("Singleplayer");
         singleplayerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Handle singleplayer button click
-                startGame(1);
+                clicked = true; 
+                dispose(); // Close the dialog
+                game.playerInfo.balance = 10000;
+                game.balanceLabel = new JLabel("Balance: $" + 10000);
+                game.player.setName("");
+                game.player.setBalance(10000);
+                game.createAndShowGUI();
+                game.promptForBetAmount();
+                game.startGame();
             }
         });
         buttonPanel.add(singleplayerButton);
@@ -39,7 +51,9 @@ public class TitleGUI extends JFrame {
         multiplayerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Handle multiplayer button click
-                removeButtons();
+                promptMultiplayerNames();
+                clicked = true; 
+                dispose(); // Close the dialog
             }
         });
         buttonPanel.add(multiplayerButton);
@@ -48,17 +62,20 @@ public class TitleGUI extends JFrame {
 
         add(panel);
         setVisible(true);
-        return answer;
     }
 
-    private void startGame(int mode) {
-        if (mode == 1) {
-            JOptionPane.showMessageDialog(null, "Starting singleplayer game...");
-            // Implement your singleplayer game logic here
-        } else if (mode == 2) {
-            JOptionPane.showMessageDialog(null, "Starting multiplayer game...");
-            // Implement your multiplayer game logic here
-        }
+    public boolean wasClicked() {
+        return clicked;
+    }
+
+    public PlayerBalanceInfo getAnswer() {
+       
+        String name = answer; 
+        Integer balance = playerInfo.playerBalances.get(name);
+        System.out.println(balance);
+        playerBalanceInfo = new PlayerBalanceInfo(name, balance);
+
+        return playerBalanceInfo;
     }
 
     private void removeButtons() {
@@ -68,21 +85,23 @@ public class TitleGUI extends JFrame {
     }
 
     private void promptMultiplayerNames() {
-        // Instantiate PlayerInfo object
-        PlayerInfo playerInfo = new PlayerInfo();
-
-        // Prompt for Player 1's name
-        String player1Name = JOptionPane.showInputDialog(null, "Enter Player 1's Name:");
-        if (player1Name != null && !player1Name.trim().isEmpty() && player1Name.matches("^[a-zA-Z0-9]*$")) {
-            // Check if player1Name already exists
-            if (playerInfo.playerExists(player1Name)) {
-                answer = player1Name;
+        String name = JOptionPane.showInputDialog(null, "Enter Player 1's Name:");
+        if (name != null && !name.trim().isEmpty() && name.matches("^[a-zA-Z0-9]*$")) {
+            if (playerInfo.playerExists(name)) {
+                int balance = playerInfo.playerBalances.get(name);
+                game.playerInfo.balance = balance;
+                game.balanceLabel = new JLabel("Balance: $" + balance);
+                game.player.setName(name);
+                game.player.setBalance(balance);
+                dispose(); 
+                game.createAndShowGUI();
+                game.promptForBetAmount();
+                game.startGame();
             } else {
                 JOptionPane.showMessageDialog(null, "Wrong user name", "Error", JOptionPane.ERROR_MESSAGE);
                 promptMultiplayerNames();
             }
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog(null, "Illegal name entered. Please use only letters and numbers.", "Error", JOptionPane.ERROR_MESSAGE);
             promptMultiplayerNames();
         }
@@ -90,16 +109,11 @@ public class TitleGUI extends JFrame {
 
 
         // Both players' names are valid, proceed with starting the game
-        JOptionPane.showMessageDialog(null, "Starting multiplayer game for Player 1: " + player1Name);
+        JOptionPane.showMessageDialog(null, "Starting multiplayer game for Player : " + name);
         // Implement your multiplayer game logic here
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new TitleGUI();
-            }
-        });
+    public static void main(String[] args){
+        TitleGUI game = new TitleGUI();
     }
 }
 

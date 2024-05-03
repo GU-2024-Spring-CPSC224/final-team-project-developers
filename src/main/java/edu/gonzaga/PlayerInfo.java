@@ -7,13 +7,13 @@ import java.util.Map;
 
 public class PlayerInfo {
     private static final String FILENAME = "players.txt";
-    private Map<String, Integer> playerBalances;
+    public Map<String, Integer> playerBalances;
     public Integer balance = 0; 
 
     public PlayerInfo() {
         playerBalances = new HashMap<>();
-        playerBalances.put("Gavin", 2000);
-        // loadPlayerBalances();
+      
+        loadPlayerBalances();
     }
 
     public boolean playerExists(String name) {
@@ -31,7 +31,8 @@ public class PlayerInfo {
         }
     }
 
-    private void loadPlayerBalances() {
+
+    public void loadPlayerBalances() {
         try {
             Path path = Paths.get(FILENAME);
             if (Files.exists(path)) {

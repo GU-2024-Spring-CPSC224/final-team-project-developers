@@ -11,10 +11,10 @@ public class BJack {
     private CardSlot[] dealerCardSlots = new CardSlot[1];
     private CardSlot[] playerCardSlots = new CardSlot[1]; // Start with one card slot
     private String basicCard;
-    private PlayerInfo playerInfo;
-    private JLabel balanceLabel;
+    public PlayerInfo playerInfo;
+    public JLabel balanceLabel;
     private DeckOfCards deck;
-    private Player player;
+    public Player player;
     private Dealer dealer;
     private JPanel playerCardArea;
     private JPanel dealerCardArea;
@@ -24,7 +24,7 @@ public class BJack {
     JButton doubleButton = new JButton("DOUBLE");
     JButton splitButton = new JButton("SPLIT");
     
-    Integer balance; 
+    Integer balance = 10000; 
     Integer bet = 0;
     Integer totalBet= 0;
     Integer playedHands = 0;
@@ -37,12 +37,14 @@ public class BJack {
         playerInfo = new PlayerInfo();
         deck = new DeckOfCards();
         dealer = new Dealer();
+        player = new Player(10000, "");
+
         initializeFrame();
+
        
     }
     private void initializeFrame() {
         frame = new JFrame("Blackjack Game");
-        // frame setup...
         frame.setVisible(true);
     }
 
@@ -65,7 +67,7 @@ public class BJack {
         }
     }
 
-    private void promptForBetAmount() {
+    public void promptForBetAmount() {
         String betAmountStr = JOptionPane.showInputDialog(null, "Enter the number to place a bet:", "Bet Amount", JOptionPane.PLAIN_MESSAGE);
         try {
             int betAmount = Integer.parseInt(betAmountStr);
@@ -88,7 +90,7 @@ public class BJack {
     }
     
 
-    private void createAndShowGUI() {
+    public void createAndShowGUI() {
         JFrame frame = new JFrame("Blackjack Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 600);
@@ -214,7 +216,7 @@ public class BJack {
     }
     
 
-    private void startGame() {
+    public void startGame() {
         deck.shuffle(); 
     
         player.initialDeal(deck);
@@ -267,6 +269,8 @@ public class BJack {
             balanceLabel.setText("Balance $" + balance);
             playerInfo.updateBalance(player.getName(), balance);
             player.setBalance(balance);
+            System.out.println(player.getName());
+            playerInfo.updateBalance(player.getName(), balance);
         }
         int response = JOptionPane.showConfirmDialog(null, "Do you want to play another round?", "Play Again", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (response == JOptionPane.YES_OPTION) {

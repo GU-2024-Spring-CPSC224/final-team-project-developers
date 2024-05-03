@@ -1,2 +1,4 @@
-null,2100
+null,1200
+Jo,0
 Gavin,2000
+Murat,1100

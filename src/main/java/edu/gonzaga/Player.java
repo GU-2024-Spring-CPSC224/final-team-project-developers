@@ -17,15 +17,15 @@ public class Player {
     public void initialDeal(DeckOfCards deck) {
         Hand newHand = new Hand();
 
-        // newHand.addCard(deck.dealTopCard());
-        // newHand.addCard(deck.dealTopCard());
+        newHand.addCard(deck.dealTopCard());
+        newHand.addCard(deck.dealTopCard());
 
         //for testing purposes
 
-        Card card1 = new Card(10, 1);
-        Card card2 = new Card(11, 2);
-        newHand.addCard(card1);
-        newHand.addCard(card2);
+        // Card card1 = new Card(10, 1);
+        // Card card2 = new Card(11, 2);
+        // newHand.addCard(card1);
+        // newHand.addCard(card2);
 
         hands.add(newHand);
     }
@@ -110,6 +110,11 @@ public class Player {
     public String getName(){
         return this.name;
     }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
     private int getGameValue(Card card) {
         int rank = card.getRank();
         if (rank == Card.JACK || rank == Card.QUEEN || rank == Card.KING) {
