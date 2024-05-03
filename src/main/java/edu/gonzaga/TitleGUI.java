@@ -18,7 +18,7 @@ public class TitleGUI extends JDialog {
 
     public TitleGUI() {
         setTitle("Blackjack");
-        setSize(1000, 1050);
+        setSize(800, 850);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel();

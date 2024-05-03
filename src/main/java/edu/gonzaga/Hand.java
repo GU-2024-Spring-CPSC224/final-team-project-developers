@@ -17,6 +17,8 @@ public class Hand {
         this.madeMove = false;
     }
 
+    
+
     public void addCard(Card card) {
         if (!isStanding) {
             cards.add(card);

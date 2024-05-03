@@ -7,6 +7,7 @@ import java.util.List;
 
 public class DeckOfCards {
     private final List<Card> deck;
+
     private static final int REBUILD_THRESHOLD = 50;
 
     public DeckOfCards() {
@@ -16,10 +17,12 @@ public class DeckOfCards {
     
     private void buildDeck() {
         deck.clear();
-        for (int i = 0; i < 4; i++) { 
-            for (int suit = Card.DIAMONDS; suit <= Card.SPADES; suit++) {
-                for (int rank = Card.ACE; rank <= Card.KING; rank++) {
-                    deck.add(new Card(rank, suit));
+        for (int j = 0; j < 5; j++) {
+            for (int i = 0; i < 4; i++) { 
+                for (int suit = Card.DIAMONDS; suit <= Card.SPADES; suit++) {
+                    for (int rank = Card.ACE; rank <= Card.KING; rank++) {
+                        deck.add(new Card(rank, suit));
+                    }
                 }
             }
         }
