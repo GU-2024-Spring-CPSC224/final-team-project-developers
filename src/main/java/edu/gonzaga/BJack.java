@@ -239,27 +239,30 @@ public class BJack {
             System.out.println("\nFinal scores for hand " + (i + 1) + ":");
             System.out.println("Dealer: " + dealerScore);
             System.out.println("Player: " + playerScore);
-    
-            double multiplier = 2; 
-            if (playerScore == 21 && player.getHands().get(i).getCards().size() == 2) {
+            double multiplier = 1;
+            
+            if (player.getHands().get(i).ifDoubled){
+                multiplier = 2;
+            }
+            if (player.getHands().size() ==1 && playerScore == 21 && player.getHands().get(i).getCards().size() == 2) {
                 multiplier = 1.5; 
             }
     
             if (playerScore > 21) {
                 System.out.println("Player busts with hand " + (i + 1));
-                playerCardSlots[i].setMoneyText("You lost $" + bet);
+                playerCardSlots[i].setMoneyText("You lost $" + multiplier* bet);
                 
             } else if (dealerScore > 21 || playerScore > dealerScore) {
                 System.out.println("Player wins with hand " + (i + 1));
                 balance += player.getHands().get(i).getBet() *2 ;
-                playerCardSlots[i].setMoneyText("You won $" + bet);
+                playerCardSlots[i].setMoneyText("You won $" + multiplier* bet);
             } else if (dealerScore > playerScore) {
                 System.out.println("Dealer wins against hand " + (i + 1));
-                playerCardSlots[i].setMoneyText("You lost $" + bet);
+                playerCardSlots[i].setMoneyText("You lost $" +multiplier *  bet);
             } else {
                 System.out.println("It's a tie with hand " + (i + 1));
                 balance += player.getHands().get(i).getBet() ;
-                playerCardSlots[i].setMoneyText("Its a tie for" + bet);
+                playerCardSlots[i].setMoneyText("Its a tie for" +multiplier*  bet);
             }
             balanceLabel.setText("Balance $" + balance);
             playerInfo.updateBalance(player.getName(), balance);
@@ -285,14 +288,23 @@ public class BJack {
 
     private void playHand(Integer i){ 
         Hand hand = player.getHands().get(i); 
-        if (!hand.isStanding()){
 
-            player.placeBet(bet); 
+        if (player.getHands().size() ==1 && hand.calculateScore() == 21) { 
+            playDealer();
+            determineWinner();
+        }
+        else{
 
-            hitButton.addActionListener(e -> performHit(i));
-            standButton.addActionListener(e -> performStand(i));
-            doubleButton.addActionListener(e -> performDouble(i));
-            splitButton.addActionListener(e -> performSplit(i));
+
+            if (!hand.isStanding()){
+
+                player.placeBet(bet); 
+
+                hitButton.addActionListener(e -> performHit(i));
+                standButton.addActionListener(e -> performStand(i));
+                doubleButton.addActionListener(e -> performDouble(i));
+                splitButton.addActionListener(e -> performSplit(i));
+            }
         }
     }
 
@@ -349,13 +361,27 @@ public class BJack {
             player.placeBet(bet); 
             balanceLabel.setText("Balance $" + balance);
             updatePlayerCardSlots(); 
-            playerCardSlots[i+1].setMoneyText("Bet: $" + bet);
+            playerCardSlots[i+1].setMoneyText("Bet: $" +bet);
         } else {
             JOptionPane.showMessageDialog(null, "Cannot perform split!", "Split Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void performDouble(Integer i) {
+        if( player.canDouble(i)){
+            player.takeCard(deck, i);
+            updatePlayerCardSlots(); 
+            balance -= bet;
+            player.placeBet(bet); 
+            balanceLabel.setText("Balance $" + balance);
+            updatePlayerCardSlots(); 
+            playerCardSlots[i].setMoneyText("Bet: $" + 2*bet);
+            player.getHands().get(i).ifDoubled =true; 
+            performStand(i);
+        }
+        else {
+            JOptionPane.showMessageDialog(null, "Cannot perform Double!", "Double Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
 

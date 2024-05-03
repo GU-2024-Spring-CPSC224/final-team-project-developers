@@ -46,6 +46,13 @@ public class Player {
         balance -= amount;
     }
 
+    public void placeBet(Integer amount, Integer i){ 
+        Hand hand = hands.get(i);
+        hand.setBet(amount + hand.getBet());
+        balance -= amount;
+    }
+
+
     public void takeCard(DeckOfCards deck, int handIndex) {
         if (handIndex < hands.size() && !hands.get(handIndex).isStanding()) {
             hands.get(handIndex).addCard(deck.dealTopCard());

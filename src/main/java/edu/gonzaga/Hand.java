@@ -8,6 +8,7 @@ public class Hand {
     private int bet;
     private boolean isStanding;
     private boolean madeMove; 
+    public boolean ifDoubled = false; 
 
     public Hand() {
         this.cards = new ArrayList<>();
