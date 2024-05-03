@@ -162,7 +162,7 @@ public class Game {
         System.out.println("Dealer's final hand: " + dealer.getHandString());
     }
 
-    private void determineWinner() {
+    public void determineWinner() {
         int dealerScore = dealer.getHand().calculateScore();
         for (int i = 0; i < player.getHands().size(); i++) {
             int playerScore = player.calculateScore(i);

@@ -202,5 +202,10 @@ public class Player {
         }
         return "Invalid hand index";
     }
-    
+
+    public void setHands(List<Hand> hands) {
+        this.hands = hands;
+    }
+
+
 }
