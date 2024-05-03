@@ -1,12 +1,10 @@
-# CPSC 224 Final Project: [Your project name here]
-
+# CPSC 224 Final Project: Black Jack 
 ### Project Description:
 
 
 ### Team Information:
 
-- Team Name:  
-- Students on team:
+- Team Name: Developers  
 - Semester: Spring 2024
 
 
