@@ -18,14 +18,14 @@ public class TitleGUI extends JDialog {
 
     public TitleGUI() {
         setTitle("Blackjack");
-        setSize(600, 400);
+        setSize(1000, 1050);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
         // Load the image
-        ImageIcon imageIcon = new ImageIcon("Classic/blackjack-logo-green-ribbon-on-600w-1639300576.png");
+        ImageIcon imageIcon = new ImageIcon("Classic/image.png");
         JLabel imageLabel = new JLabel(imageIcon);
         imageLabel.setHorizontalAlignment(JLabel.CENTER);
         panel.add(imageLabel, BorderLayout.CENTER);
